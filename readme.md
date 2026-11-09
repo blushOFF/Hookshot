@@ -12,6 +12,40 @@
 <h4 align="center">The Legend of Zelda: Ocarina of Time (Nintendo Switch 2) running natively on Windows & Linux, with no emulator.
 </h4>
 
+> ## About this fork (blushOFF)
+>
+> This fork follows upstream `main` and adds what was found while tuning Hookshot for one PC: Windows 11, RTX 3070 8 GB,
+> i7-14700KF, 32 GB RAM, 4K 240 Hz monitor. Hookshot itself is the work of NotRexed and its contributors (see Credits).
+>
+> **What it adds**
+>
+> - **The audio effects the game calls that upstream leaves dry** (`host/nn_audio.c`): the plain reverb (`AddReverb` and
+>   its setters, run on the existing I3DL2 network), the delay (`AddDelay`: echo with feedback, low-pass and channel
+>   spread), the biquad filter on a mix (`AddBiquadFilter`), the float biquad parameters of voices and splitter
+>   destinations, and the device and voice-drop calls. A gameplay log has no `unimplemented import` for `nn::audio` left.
+>
+> **Settings for an 8 GB NVIDIA card** (`hookshot_env.txt` next to `hookshot.exe`)
+>
+> ```
+> RX_VK_KEEP_RETIRED=0
+> RX_VK_ASTC_BC_ALL=1
+> RX_VK_IMAGE_BLOCK_MB=32
+> ```
+>
+> - `RX_VK_KEEP_RETIRED=0`: with the Windows default (retired pools kept), a long session over ~20 areas lost the device
+>   on the RTX 3070 (2 tours of 2); with it, 0 of 2.
+> - `RX_VK_ASTC_BC_ALL=1`, `RX_VK_IMAGE_BLOCK_MB=32`: upstream PR #887's settings; VRAM stays under what Windows allows.
+>
+> **Measured on this PC** (upstream `main` of 2026-11-09 + this fork, the settings above)
+>
+> - 29 of the 31 debug-teleport destinations visited by script: no flicker in any of them; the game runs at 28-60 fps
+>   depending on the area (Hyrule Castle, the Market, Kakariko, Lake Hylia and Zora's Domain are the heaviest).
+> - Frame generation in Kokiri Forest: 2x shows ~92 frames a second, 3x ~135, the game itself ~48.
+> - A one-hour session in Kokiri Forest: no crash, memory and VRAM flat.
+> - The 4K output (`HOS_OUTPUT_RES=2`) does not fit in 8 GB: 10.8 GB used of 6.3 GB allowed, ~16 fps.
+>
+> **En français** : fork adapté à un PC Windows / RTX 3070 8 Go. Effets audio complets, réglages conseillés pour les
+> cartes 8 Go, correctif des plantages en longue session. La suite du README est celle du projet d'origine.
 
 <p align="center">
   <a href="#project-status">Status</a> |
